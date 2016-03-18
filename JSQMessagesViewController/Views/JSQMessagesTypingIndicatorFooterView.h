@@ -65,3 +65,6 @@ FOUNDATION_EXPORT const CGFloat kJSQMessagesTypingIndicatorFooterViewHeight;
                  forCollectionView:(UICollectionView *)collectionView;
 
 @end
+
+@interface JSQMessagesTypingIndicatorCircleView : UIView
+@end
