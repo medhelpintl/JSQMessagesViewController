@@ -88,6 +88,7 @@ const CGFloat kJSQMessagesTypingIndicatorFooterViewHeight = 46.0f;
 
 - (void)configureWithEllipsisColor:(UIColor *)ellipsisColor
                 messageBubbleColor:(UIColor *)messageBubbleColor
+                          animated:(BOOL)animated
                shouldDisplayOnLeft:(BOOL)shouldDisplayOnLeft
                  forCollectionView:(UICollectionView *)collectionView
 {
@@ -123,19 +124,30 @@ const CGFloat kJSQMessagesTypingIndicatorFooterViewHeight = 46.0f;
     
     [self setNeedsUpdateConstraints];
     
-    // Start Animating
-    [self startTypingIndicatorAnimating:ellipsisColor];
+    // Configure correct color and (whether/not) animated
+    [self setTypingIndicatorAnimated:animated :ellipsisColor];
 }
 
-- (void) startTypingIndicatorAnimating:(UIColor*) ellipsisColor
+- (void) setTypingIndicatorEllipsisColor:(UIColor*) ellipsisColor
 {
+    self.typingIndicatorView1.backgroundColor = ellipsisColor;
+    self.typingIndicatorView2.backgroundColor = ellipsisColor;
+    self.typingIndicatorView3.backgroundColor = ellipsisColor;
+}
+
+- (void) setTypingIndicatorAnimated:(BOOL) animated :(UIColor*) ellipsisColor
+{
+    // Configure Base Color
+    [self setTypingIndicatorEllipsisColor:ellipsisColor];
     // Remove existing animator if exist
     if (self.animator) {
         [self.animator stopAnimating];
     }
-    // New animator
-    self.animator = [[JSQMessagesTypingIndicatorAnimator alloc] initWithTypingIndicatorView:self :ellipsisColor];
-    [self.animator startAnimating];
+    // If animated -> New Animator
+    if (animated) {
+        self.animator = [[JSQMessagesTypingIndicatorAnimator alloc] initWithTypingIndicatorView:self :ellipsisColor];
+        [self.animator startAnimating];
+    }
 }
 
 @end
@@ -172,9 +184,11 @@ const CGFloat kJSQMessagesTypingIndicatorFooterViewHeight = 46.0f;
 #define kTypingIndicatorSingleDot_Darker_AnimationDuration 1.5f
 // How long does it take to transition from one dark circle to another?
 #define kTypingIndicatorSingleDot_TransitionTime 0.4f
+// Darkening co-efficient
+#define kTypingIndicatorAnimatedDot_Darkening_Coefficient 3.0f
 
 - (void) startTypingIndicatorAnimating:(UIColor*) ellipseColor {
-    [self startTypingIndicatorAnimating:0 :@[self.typingView.typingIndicatorView1, self.typingView.typingIndicatorView2, self.typingView.typingIndicatorView3] :ellipseColor :[ellipseColor jsq_colorByDarkeningColorWithValue:3.0f]];
+    [self startTypingIndicatorAnimating:0 :@[self.typingView.typingIndicatorView1, self.typingView.typingIndicatorView2, self.typingView.typingIndicatorView3] :ellipseColor :[ellipseColor jsq_colorByDarkeningColorWithValue:kTypingIndicatorAnimatedDot_Darkening_Coefficient]];
 }
 
 - (void) startTypingIndicatorAnimating:(int) typingIndex :(NSArray*)indicatorViews :(UIColor*)ellipseColor :(UIColor*)darkerEllipseColor {
